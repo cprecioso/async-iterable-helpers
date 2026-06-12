@@ -26,3 +26,29 @@ export function from<T>(
 export function of<T>(...items: readonly T[]): Wrapper<Awaited<T>> {
   return from(items);
 }
+
+/**
+ * Wraps an empty sequence.
+ *
+ * @returns A {@link Wrapper} that yields no items.
+ */
+export function empty(): Wrapper<never> {
+  return from([]);
+}
+
+/**
+ * Wraps an infinite sequence that repeats the same item forever. Combine with
+ * a pipe like {@link take} to bound it.
+ *
+ * @param item The item to yield repeatedly.
+ * @returns A {@link Wrapper} that yields `item` endlessly.
+ */
+export function infinite<T>(item: T): Wrapper<T> {
+  return new Wrapper(
+    (async function* () {
+      while (true) {
+        yield item;
+      }
+    })(),
+  );
+}

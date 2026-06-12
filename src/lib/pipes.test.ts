@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { from, of } from "./creators";
-import { filter, filterMap, map, take } from "./pipes";
+import {
+  append,
+  concat,
+  filter,
+  filterMap,
+  flatMap,
+  flatten,
+  map,
+  prepend,
+  take,
+} from "./pipes";
 import { toArray } from "./sinks";
 
 describe("map", () => {
@@ -115,5 +125,117 @@ describe("take", () => {
     ]);
     // One extra item is pulled before the break short-circuits.
     expect(produced).toBe(4);
+  });
+});
+
+describe("concat", () => {
+  it("yields the source followed by a sync iterable", async () => {
+    expect(
+      await of(1, 2)
+        .pipe(concat([3, 4]))
+        .sink(toArray()),
+    ).toEqual([1, 2, 3, 4]);
+  });
+
+  it("yields the source followed by an async iterable", async () => {
+    expect(
+      await of(1, 2)
+        .pipe(concat(of(3, 4)))
+        .sink(toArray()),
+    ).toEqual([1, 2, 3, 4]);
+  });
+
+  it("handles an empty source", async () => {
+    expect(
+      await of<number>()
+        .pipe(concat([1, 2]))
+        .sink(toArray()),
+    ).toEqual([1, 2]);
+  });
+});
+
+describe("prepend", () => {
+  it("yields the given items before the source", async () => {
+    expect(await of(3, 4).pipe(prepend(1, 2)).sink(toArray())).toEqual([
+      1, 2, 3, 4,
+    ]);
+  });
+
+  it("yields the source unchanged when no items are given", async () => {
+    expect(await of(1, 2).pipe(prepend()).sink(toArray())).toEqual([1, 2]);
+  });
+});
+
+describe("append", () => {
+  it("yields the given items after the source", async () => {
+    expect(await of(1, 2).pipe(append(3, 4)).sink(toArray())).toEqual([
+      1, 2, 3, 4,
+    ]);
+  });
+
+  it("yields the source unchanged when no items are given", async () => {
+    expect(await of(1, 2).pipe(append()).sink(toArray())).toEqual([1, 2]);
+  });
+});
+
+describe("flatten", () => {
+  it("flattens a source of sync iterables by one level", async () => {
+    expect(
+      await of([1, 2], [3], [4, 5]).pipe(flatten()).sink(toArray()),
+    ).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it("flattens a source of async iterables", async () => {
+    expect(await of(of(1, 2), of(3)).pipe(flatten()).sink(toArray())).toEqual([
+      1, 2, 3,
+    ]);
+  });
+
+  it("flattens only one level", async () => {
+    expect(
+      await of([[1], [2]], [[3]])
+        .pipe(flatten())
+        .sink(toArray()),
+    ).toEqual([[1], [2], [3]]);
+  });
+
+  it("yields nothing for empty inner iterables", async () => {
+    expect(
+      await of<number[]>([], [], []).pipe(flatten()).sink(toArray()),
+    ).toEqual([]);
+  });
+});
+
+describe("flatMap", () => {
+  it("maps each item to an iterable and flattens the results", async () => {
+    expect(
+      await of(1, 2, 3)
+        .pipe(flatMap((n: number) => [n, n * 10]))
+        .sink(toArray()),
+    ).toEqual([1, 10, 2, 20, 3, 30]);
+  });
+
+  it("awaits async mapping functions", async () => {
+    expect(
+      await of(1, 2)
+        .pipe(flatMap(async (n: number) => [n, -n]))
+        .sink(toArray()),
+    ).toEqual([1, -1, 2, -2]);
+  });
+
+  it("accepts async iterables from the mapping function", async () => {
+    expect(
+      await of(1, 2)
+        .pipe(flatMap((n: number) => of(n, n)))
+        .sink(toArray()),
+    ).toEqual([1, 1, 2, 2]);
+  });
+
+  it("drops items that map to an empty iterable", async () => {
+    expect(
+      await of(1, 2, 3)
+        .pipe(flatMap((n: number) => (n % 2 === 0 ? [n] : [])))
+        .sink(toArray()),
+    ).toEqual([2]);
   });
 });

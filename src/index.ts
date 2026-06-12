@@ -1,3 +1,4 @@
+export * from "./lib/combinators";
 export * from "./lib/creators";
 export * from "./lib/pipes";
 export * from "./lib/sinks";

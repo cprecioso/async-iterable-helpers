@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { from, of } from "./creators";
+import { empty, from, infinite, of } from "./creators";
+import { take } from "./pipes";
 import { toArray } from "./sinks";
 
 describe("from", () => {
@@ -48,5 +49,26 @@ describe("of", () => {
 
   it("awaits yielded promises", async () => {
     expect(await of(Promise.resolve("x")).sink(toArray())).toEqual(["x"]);
+  });
+});
+
+describe("empty", () => {
+  it("yields no items", async () => {
+    expect(await empty().sink(toArray())).toEqual([]);
+  });
+});
+
+describe("infinite", () => {
+  it("repeats the same item", async () => {
+    expect(await infinite(7).pipe(take(3)).sink(toArray())).toEqual([7, 7, 7]);
+  });
+
+  it("does not terminate on its own", async () => {
+    let count = 0;
+    for await (const item of infinite("x")) {
+      expect(item).toBe("x");
+      if (++count >= 5) break;
+    }
+    expect(count).toBe(5);
   });
 });

@@ -1,4 +1,5 @@
-import type { MaybePromise } from "./util";
+import { concatAll } from "./combinators";
+import { compose, type MaybePromise } from "./util";
 import type { PipeFn } from "./wrapper";
 
 /**
@@ -75,4 +76,67 @@ export function take<T>(n: number): PipeFn<T, Awaited<T>> {
       }
     }
   };
+}
+
+/**
+ * Appends another sync or async iterable after the source, yielding all of the
+ * source's items first, then all of `iterable`'s.
+ *
+ * @param iterable The iterable to yield after the source is exhausted.
+ * @returns A pipe that yields the source followed by `iterable`.
+ */
+export function concat<T>(
+  iterable: Iterable<T> | AsyncIterable<T>,
+): PipeFn<T, Awaited<T>> {
+  return (source) => concatAll([source, iterable]);
+}
+
+/**
+ * Yields the given items before the source's items.
+ *
+ * @param items The items to yield ahead of the source.
+ * @returns A pipe that yields `items` followed by the source.
+ */
+export function prepend<T>(...items: readonly T[]): PipeFn<T, Awaited<T>> {
+  return (source) => concatAll([items, source]);
+}
+
+/**
+ * Yields the given items after the source's items.
+ *
+ * @param items The items to yield once the source is exhausted.
+ * @returns A pipe that yields the source followed by `items`.
+ */
+export function append<T>(...items: readonly T[]): PipeFn<T, Awaited<T>> {
+  return (source) => concatAll([source, items]);
+}
+
+/**
+ * Flattens a source of iterables by one level, yielding each inner item in
+ * order. The inner iterables may be sync or async.
+ *
+ * @returns A pipe that yields the items of each inner iterable.
+ */
+export function flatten<T>(): PipeFn<
+  Iterable<T> | AsyncIterable<T>,
+  Awaited<T>
+> {
+  return async function* (iterable) {
+    for await (const item of iterable) {
+      yield* item;
+    }
+  };
+}
+
+/**
+ * Maps each item to an iterable and flattens the results by one level. The
+ * mapping function may be async, and may return a sync or async iterable.
+ *
+ * @param fn Maps an item to an iterable of values to yield.
+ * @returns A pipe that yields the flattened mapped values.
+ */
+export function flatMap<T, U>(
+  fn: (item: Awaited<T>) => MaybePromise<Iterable<U> | AsyncIterable<U>>,
+): PipeFn<T, Awaited<U>> {
+  return compose(map(fn), flatten());
 }
