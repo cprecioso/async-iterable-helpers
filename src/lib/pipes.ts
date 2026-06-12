@@ -13,7 +13,7 @@ export function map<T, U>(
 
 export function filter<T>(
   fn: (item: Awaited<T>) => MaybePromise<boolean>,
-): PipeFn<T, T> {
+): PipeFn<T, Awaited<T>> {
   return async function* (iterable) {
     for await (const item of iterable) {
       if (await fn(item)) {
@@ -36,7 +36,7 @@ export function filterMap<T, U>(
   };
 }
 
-export function take<T>(n: number): PipeFn<T, T> {
+export function take<T>(n: number): PipeFn<T, Awaited<T>> {
   return async function* (iterable) {
     let i = 0;
     for await (const item of iterable) {

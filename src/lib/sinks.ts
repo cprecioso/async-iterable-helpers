@@ -14,11 +14,11 @@ export function reduce<T, U>(
   };
 }
 
-export function toArray<T>(): SinkFn<T, T[]> {
+export function toArray<T>(): SinkFn<T, Awaited<T>[]> {
   return reduce((acc, item) => {
     acc.push(item);
     return acc;
-  }, [] as T[]);
+  }, [] as Awaited<T>[]);
 }
 
 export function first<T>(): SinkFn<T, T | undefined> {

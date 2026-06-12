@@ -10,6 +10,6 @@ export function from<T>(
   );
 }
 
-export function of<T>(...items: readonly T[]): Wrapper<T> {
+export function of<T>(...items: readonly T[]): Wrapper<Awaited<T>> {
   return from(items);
 }
