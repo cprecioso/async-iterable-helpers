@@ -1,33 +1,40 @@
-# @cprecioso/order-by-example
+# @cprecioso/async-iterable-helpers
 
-Build a comparator from example orderings. Give it lists of items in the order you want, and it returns a `compare` function you can hand to `Array.prototype.sort`.
+Lazy, composable helpers for working with sync and async iterables. Wrap any iterable, build a pipeline of transforms, and consume it with a sink. Nothing is evaluated until a sink runs, and mapping, filtering, and reducing functions may all be async.
 
-Targets ES2019. Runs in Node, the browser, and anywhere else.
+Similar to RxJS, but treated as ordered sequences of values rather than streams of events, and implicitly unwrapping `Promise`s.
 
 ## Install
 
 ```sh
-npm install @cprecioso/order-by-example
+npm install @cprecioso/async-iterable-helpers
 ```
 
 ## Usage
 
+Start with a creator to get a `Wrapper`, chain `.pipe()` calls to transform the
+sequence, and finish with `.sink()` to consume it:
+
 ```ts
-import { makeSort } from "@cprecioso/order-by-example";
+import { from, filter, map, toArray } from "@cprecioso/async-iterable-helpers";
 
-const sort = makeSort([
-  ["apple", "banana", "cherry"],
-  ["banana", "date"],
-]);
+const result = await from([1, 2, 3, 4])
+  .pipe(filter((n) => n % 2 === 0))
+  .pipe(map(async (n) => n * 10))
+  .sink(toArray());
 
-["cherry", "banana", "apple"].sort(sort.compare);
-// ['apple', 'banana', 'cherry']
+// result: [20, 40]
+```
 
-sort.compare("apple", "banana"); // -1
-sort.compare("banana", "date"); // -1
-sort.compare("apple", "date"); // 0 — no single example contains both
+A `Wrapper` is itself an `AsyncIterable`, so you can also use it directly with
+`for await`:
+
+```ts
+for await (const n of from([1, 2, 3]).pipe(map((n) => n * 2))) {
+  console.log(n); // 2, 4, 6
+}
 ```
 
 ## API
 
-Check the API reference at https://cprecioso.github.io/order-by-example/
+Check the API reference at https://cprecioso.github.io/async-iterable-helpers/
