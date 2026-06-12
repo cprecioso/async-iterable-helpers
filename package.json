@@ -1,0 +1,45 @@
+{
+  "name": "@cprecioso/async-iterable-helpers",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Helpers for working with async iterables.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cprecioso/async-iterable-helpers.git"
+  },
+  "homepage": "https://github.com/cprecioso/async-iterable-helpers#readme",
+  "bugs": {
+    "url": "https://github.com/cprecioso/async-iterable-helpers/issues"
+  },
+  "author": "Carlos Precioso <npm@precioso.design>",
+  "license": "ISC",
+  "packageManager": "yarn@4.16.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "docs": "typedoc --plugin typedoc-plugin-mdn-links",
+    "prepack": "yarn run build",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@cprecioso/tsconfig": "^4.1.0",
+    "prettier": "3.8.3",
+    "prettier-plugin-organize-imports": "4.3.0",
+    "prettier-plugin-pkg": "0.22.1",
+    "prettier-plugin-sh": "0.18.1",
+    "tsdown": "^0.22.2",
+    "typedoc": "^0.28.19",
+    "typedoc-plugin-mdn-links": "^5.1.1",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.8"
+  }
+}
