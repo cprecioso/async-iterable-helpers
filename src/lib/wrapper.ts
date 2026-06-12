@@ -1,11 +1,15 @@
 export type PipeFn<T, U> = (iterable: AsyncIterable<T>) => AsyncIterable<U>;
 export type SinkFn<T, U> = (iterable: AsyncIterable<T>) => Promise<U>;
 
-export class Wrapper<T> {
+export class Wrapper<T> implements AsyncIterable<T> {
   #iterable;
 
   constructor(iterable: AsyncIterable<T>) {
     this.#iterable = iterable;
+  }
+
+  [Symbol.asyncIterator]() {
+    return this.#iterable[Symbol.asyncIterator]();
   }
 
   /**
