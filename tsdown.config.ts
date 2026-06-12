@@ -7,7 +7,7 @@ export default defineConfig({
 
   format: "esm",
   platform: "neutral",
-  target: "es2019",
+  target: "es2022",
 
   sourcemap: true,
   dts: { sourcemap: true },
