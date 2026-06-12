@@ -1,5 +1,5 @@
 import { concatAll } from "./combinators";
-import { compose, type MaybePromise } from "./util";
+import { compose, type AnyIterable, type MaybePromise } from "./util";
 import type { PipeFn } from "./wrapper";
 
 /**
@@ -85,9 +85,7 @@ export function take<T>(n: number): PipeFn<T, Awaited<T>> {
  * @param iterable The iterable to yield after the source is exhausted.
  * @returns A pipe that yields the source followed by `iterable`.
  */
-export function concat<T>(
-  iterable: Iterable<T> | AsyncIterable<T>,
-): PipeFn<T, Awaited<T>> {
+export function concat<T>(iterable: AnyIterable<T>): PipeFn<T, Awaited<T>> {
   return (source) => concatAll([source, iterable]);
 }
 
@@ -117,10 +115,7 @@ export function append<T>(...items: readonly T[]): PipeFn<T, Awaited<T>> {
  *
  * @returns A pipe that yields the items of each inner iterable.
  */
-export function flatten<T>(): PipeFn<
-  Iterable<T> | AsyncIterable<T>,
-  Awaited<T>
-> {
+export function flatten<T>(): PipeFn<AnyIterable<T>, Awaited<T>> {
   return async function* (iterable) {
     for await (const item of iterable) {
       yield* item;
@@ -136,7 +131,7 @@ export function flatten<T>(): PipeFn<
  * @returns A pipe that yields the flattened mapped values.
  */
 export function flatMap<T, U>(
-  fn: (item: Awaited<T>) => MaybePromise<Iterable<U> | AsyncIterable<U>>,
+  fn: (item: Awaited<T>) => MaybePromise<AnyIterable<U>>,
 ): PipeFn<T, Awaited<U>> {
   return compose(map(fn), flatten());
 }

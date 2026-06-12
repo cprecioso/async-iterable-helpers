@@ -1,3 +1,4 @@
+import type { AnyIterable } from "./util";
 import { Wrapper } from "./wrapper";
 
 /**
@@ -7,9 +8,7 @@ import { Wrapper } from "./wrapper";
  * @param iterable The source iterable to wrap.
  * @returns A {@link Wrapper} yielding the awaited values of the source.
  */
-export function from<T>(
-  iterable: Iterable<T> | AsyncIterable<T>,
-): Wrapper<Awaited<T>> {
+export function from<T>(iterable: AnyIterable<T>): Wrapper<Awaited<T>> {
   return new Wrapper(
     (async function* () {
       yield* iterable;
