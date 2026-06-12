@@ -1,6 +1,6 @@
 {
   "name": "@cprecioso/async-iterable-helpers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Helpers for working with async iterables.",
   "repository": {
