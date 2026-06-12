@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/cprecioso/async-iterable-helpers/compare/v0.1.0...v0.1.1) (2026-06-12)
+
+
+### Bug Fixes
+
+* add all functions to docs ([69e478d](https://github.com/cprecioso/async-iterable-helpers/commit/69e478d92d98856d900b3c7c07625a871c4ece4a))
+
 ## 0.1.0 (2026-06-12)
 
 
