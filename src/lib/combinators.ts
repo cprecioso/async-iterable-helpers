@@ -1,3 +1,7 @@
+import { from } from "./creators";
+import { flatMap } from "./pipes";
+import type { AnyIterable } from "./util";
+
 /**
  * Concatenates several sync or async iterables into a single async iterable,
  * yielding all items from the first, then the second, and so on. Each iterable
@@ -8,11 +12,7 @@
  * sequence.
  */
 export function concatAll<T>(
-  iterables: (Iterable<T> | AsyncIterable<T>)[],
+  iterables: AnyIterable<AnyIterable<T>>,
 ): AsyncIterable<Awaited<T>> {
-  return (async function* () {
-    for (const iterable of iterables) {
-      yield* iterable;
-    }
-  })();
+  return from(iterables).pipe(flatMap((iterable) => from(iterable)));
 }
