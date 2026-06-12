@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/cprecioso/async-iterable-helpers/compare/v0.1.2...v0.1.3) (2026-06-12)
+
+
+### Bug Fixes
+
+* also return a wrapped iterable in types of `concatAll` ([b0f882f](https://github.com/cprecioso/async-iterable-helpers/commit/b0f882f576716290fbad5bf1217a5ecaeaaf9714))
+
 ## [0.1.2](https://github.com/cprecioso/async-iterable-helpers/compare/v0.1.1...v0.1.2) (2026-06-12)
 
 
