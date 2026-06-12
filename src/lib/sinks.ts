@@ -30,12 +30,6 @@ export function first<T>(): SinkFn<T, T | undefined> {
   };
 }
 
-export function last<T>(): SinkFn<T, T | undefined> {
-  return async function (iterable) {
-    let lastItem: T | undefined = undefined;
-    for await (const item of iterable) {
-      lastItem = item;
-    }
-    return lastItem;
-  };
+export function last<T>(): SinkFn<T, Awaited<T> | undefined> {
+  return reduce((_, item) => item, undefined as Awaited<T> | undefined);
 }
