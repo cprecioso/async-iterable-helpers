@@ -10,8 +10,58 @@ import {
   map,
   prepend,
   take,
+  tap,
 } from "./pipes";
 import { toArray } from "./sinks";
+
+describe("tap", () => {
+  it("yields the original items unchanged", async () => {
+    expect(
+      await of(1, 2, 3)
+        .pipe(tap(() => {}))
+        .sink(toArray()),
+    ).toEqual([1, 2, 3]);
+  });
+
+  it("invokes fn once for each item in order", async () => {
+    const seen: number[] = [];
+    await of(1, 2, 3)
+      .pipe(tap((n: number) => void seen.push(n)))
+      .sink(toArray());
+    expect(seen).toEqual([1, 2, 3]);
+  });
+
+  it("awaits async functions before yielding", async () => {
+    const seen: number[] = [];
+    const result = await of(1, 2, 3)
+      .pipe(
+        tap(async (n: number) => {
+          seen.push(n);
+        }),
+      )
+      .sink(toArray());
+    expect(result).toEqual([1, 2, 3]);
+    expect(seen).toEqual([1, 2, 3]);
+  });
+
+  it("does not modify items when fn returns a value", async () => {
+    expect(
+      await of(1, 2)
+        .pipe(tap((n: number) => (n * 100) as unknown as void))
+        .sink(toArray()),
+    ).toEqual([1, 2]);
+  });
+
+  it("does not invoke fn for an empty source", async () => {
+    let calls = 0;
+    expect(
+      await of<number>()
+        .pipe(tap(() => void calls++))
+        .sink(toArray()),
+    ).toEqual([]);
+    expect(calls).toBe(0);
+  });
+});
 
 describe("map", () => {
   it("transforms each item", async () => {
