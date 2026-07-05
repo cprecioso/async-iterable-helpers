@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/cprecioso/async-iterable-helpers/compare/v0.1.3...v0.2.0) (2026-07-05)
+
+
+### Features
+
+* add `tap` pipe ([1d5a811](https://github.com/cprecioso/async-iterable-helpers/commit/1d5a811ab65c21fa8cfc78c27019777336dbc78e))
+
 ## [0.1.3](https://github.com/cprecioso/async-iterable-helpers/compare/v0.1.2...v0.1.3) (2026-06-12)
 
 
