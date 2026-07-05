@@ -21,6 +21,21 @@ export function tap<T>(
 }
 
 /**
+ * Pairs each item with its zero-based index, yielding `[index, item]` tuples in
+ * order.
+ *
+ * @returns A pipe that yields `[index, item]` pairs.
+ */
+export function enumerated<T>(): PipeFn<T, [number, Awaited<T>]> {
+  return async function* (iterable) {
+    let i = 0;
+    for await (const item of iterable) {
+      yield [i++, item];
+    }
+  };
+}
+
+/**
  * Runs `fn` as a running accumulation over the source, yielding the accumulator
  * after each item. Like a `reduce` that emits every intermediate result. The
  * reducer may be async; its result is awaited before being yielded.

@@ -3,6 +3,7 @@ import { from, of } from "./creators";
 import {
   append,
   concat,
+  enumerated,
   filter,
   filterMap,
   flatMap,
@@ -61,6 +62,22 @@ describe("tap", () => {
         .sink(toArray()),
     ).toEqual([]);
     expect(calls).toBe(0);
+  });
+});
+
+describe("enumerated", () => {
+  it("pairs each item with its zero-based index", async () => {
+    expect(
+      await of("a", "b", "c").pipe(enumerated()).sink(toArray()),
+    ).toEqual([
+      [0, "a"],
+      [1, "b"],
+      [2, "c"],
+    ]);
+  });
+
+  it("yields nothing for an empty source", async () => {
+    expect(await of<number>().pipe(enumerated()).sink(toArray())).toEqual([]);
   });
 });
 
