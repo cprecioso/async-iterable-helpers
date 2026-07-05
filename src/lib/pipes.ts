@@ -1,6 +1,22 @@
-import { concatAll } from "./combinators";
-import { compose, type AnyIterable, type MaybePromise } from "./util";
-import type { PipeFn } from "./wrapper";
+import { concatAll } from "./combinators"
+import { compose, type AnyIterable, type MaybePromise } from "./util"
+import type { PipeFn } from "./wrapper"
+
+/**
+ * Invokes `fn` for each item in the source, yielding the original items unchanged.
+ * The function may be async; its result is awaited.
+ *
+ * @param fn Function to invoke for each item.
+ * @returns A pipe that yields the original items.
+ */
+export function tap<T>(fn: (item: Awaited<T>) => MaybePromise<void>): PipeFn<T, Awaited<T>> {
+  return async function* (iterable) {
+    for await (const item of iterable) {
+      await fn(item);
+      yield item;
+    }
+  };
+}
 
 /**
  * Transforms each item using `fn`. The mapping function may be async; its
