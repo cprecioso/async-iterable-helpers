@@ -19,6 +19,28 @@ export function tap<T>(fn: (item: Awaited<T>) => MaybePromise<void>): PipeFn<T, 
 }
 
 /**
+ * Runs `fn` as a running accumulation over the source, yielding the accumulator
+ * after each item. Like a `reduce` that emits every intermediate result. The
+ * reducer may be async; its result is awaited before being yielded.
+ *
+ * @param fn Combines the current accumulator with an item to produce the next.
+ * @param initial The starting accumulator value.
+ * @returns A pipe that yields the accumulator after each item.
+ */
+export function scan<T, U>(
+  fn: (acc: U, item: Awaited<T>) => MaybePromise<U>,
+  initial: U,
+): PipeFn<T, Awaited<U>> {
+  return async function* (iterable) {
+    let acc = initial;
+    for await (const item of iterable) {
+      acc = await fn(acc, item);
+      yield acc;
+    }
+  };
+}
+
+/**
  * Transforms each item using `fn`. The mapping function may be async; its
  * result is awaited before being yielded.
  *

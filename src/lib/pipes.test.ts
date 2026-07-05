@@ -9,6 +9,7 @@ import {
   flatten,
   map,
   prepend,
+  scan,
   take,
   tap,
 } from "./pipes";
@@ -60,6 +61,40 @@ describe("tap", () => {
         .sink(toArray()),
     ).toEqual([]);
     expect(calls).toBe(0);
+  });
+});
+
+describe("scan", () => {
+  it("yields the accumulator after each item", async () => {
+    expect(
+      await of(1, 2, 3, 4)
+        .pipe(scan((acc: number, n: number) => acc + n, 0))
+        .sink(toArray()),
+    ).toEqual([1, 3, 6, 10]);
+  });
+
+  it("does not yield the initial value", async () => {
+    expect(
+      await of<number>()
+        .pipe(scan((acc: number, n: number) => acc + n, 42))
+        .sink(toArray()),
+    ).toEqual([]);
+  });
+
+  it("awaits async reducers", async () => {
+    expect(
+      await of(1, 2, 3)
+        .pipe(scan(async (acc: number, n: number) => acc + n, 0))
+        .sink(toArray()),
+    ).toEqual([1, 3, 6]);
+  });
+
+  it("can accumulate into a different type", async () => {
+    expect(
+      await of("a", "b", "c")
+        .pipe(scan((acc: string[], s: string) => [...acc, s], [] as string[]))
+        .sink(toArray()),
+    ).toEqual([["a"], ["a", "b"], ["a", "b", "c"]]);
   });
 });
 
