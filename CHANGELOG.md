@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/cprecioso/async-iterable-helpers/compare/v0.2.0...v0.3.0) (2026-07-05)
+
+
+### Features
+
+* add `enumerated` ([f852991](https://github.com/cprecioso/async-iterable-helpers/commit/f8529910ae8f99ec287559698840ab5c228005ae))
+* add `scan` ([bf9e9de](https://github.com/cprecioso/async-iterable-helpers/commit/bf9e9dedcb3c76b0d0b35e69e1e72e32a5605606))
+
 ## [0.2.0](https://github.com/cprecioso/async-iterable-helpers/compare/v0.1.3...v0.2.0) (2026-07-05)
 
 
