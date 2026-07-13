@@ -17,6 +17,25 @@ export function from<T>(iterable: AnyIterable<T>): Wrapper<Awaited<T>> {
 }
 
 /**
+ * Wraps an iterable that is produced lazily by an async function. `fn` is only
+ * called once iteration starts, so any setup it does (and any error it throws)
+ * is deferred until then.
+ *
+ * @param fn A function returning a promise of the source iterable.
+ * @returns A {@link Wrapper} yielding the awaited values of the produced
+ *   iterable.
+ */
+export function create<T>(
+  fn: () => Promise<AnyIterable<T>>,
+): Wrapper<Awaited<T>> {
+  return from(
+    (async function* () {
+      yield* await fn();
+    })(),
+  );
+}
+
+/**
  * Wraps a fixed list of items in a {@link Wrapper}.
  *
  * @param items The items to wrap.

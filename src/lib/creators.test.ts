@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { empty, from, infinite, of } from "./creators";
+import { create, empty, from, infinite, of } from "./creators";
 import { take } from "./pipes";
 import { toArray } from "./sinks";
 
@@ -35,6 +35,63 @@ describe("from", () => {
       return total;
     });
     expect(result).toBe(6);
+  });
+});
+
+describe("create", () => {
+  it("wraps a sync iterable produced by the function", async () => {
+    expect(await create(async () => [1, 2, 3]).sink(toArray())).toEqual([
+      1, 2, 3,
+    ]);
+  });
+
+  it("wraps an async iterable produced by the function", async () => {
+    expect(await create(async () => of("a", "b")).sink(toArray())).toEqual([
+      "a",
+      "b",
+    ]);
+  });
+
+  it("wraps an empty iterable", async () => {
+    expect(await create(async () => []).sink(toArray())).toEqual([]);
+  });
+
+  it("awaits yielded promises", async () => {
+    expect(
+      await create(async () => [Promise.resolve(1), Promise.resolve(2)]).sink(
+        toArray(),
+      ),
+    ).toEqual([1, 2]);
+  });
+
+  it("does not call the function until iteration starts", async () => {
+    let called = 0;
+    const wrapper = create(async () => {
+      called++;
+      return [1, 2, 3];
+    });
+    expect(called).toBe(0);
+
+    await wrapper.sink(toArray());
+    expect(called).toBe(1);
+  });
+
+  it("does not call the function when a pipe is applied", async () => {
+    let called = 0;
+    create(async () => {
+      called++;
+      return [1, 2, 3];
+    }).pipe(take(2));
+    expect(called).toBe(0);
+  });
+
+  it("rejects when the function rejects", async () => {
+    const error = new Error("boom");
+    await expect(
+      create(async () => {
+        throw error;
+      }).sink(toArray()),
+    ).rejects.toThrow(error);
   });
 });
 
