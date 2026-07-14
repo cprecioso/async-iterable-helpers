@@ -2,7 +2,7 @@
 
 Lazy, composable helpers for working with sync and async iterables. Wrap any iterable, build a pipeline of transforms, and consume it with a sink. Nothing is evaluated until a sink runs, and mapping, filtering, and reducing functions may all be async.
 
-Similar to RxJS, but treated as ordered sequences of values rather than streams of events, and implicitly unwrapping `Promise`s.
+The iterables here match JS Async Generators semantics (and indeed are implemented through Async Generators). In Observable parlance, that means they are [**cold**](https://rxjs.dev/guide/glossary-and-semantics#cold) and [**pull-based**](https://rxjs.dev/guide/glossary-and-semantics#pull). The scheduler is always async (based on native `Promise` resolution), and elements in the stream are processed one at a time through the whole chain before going on to the next one. `Promise`s are implicitly unwrapped.
 
 ## Install
 
