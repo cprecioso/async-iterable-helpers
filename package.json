@@ -32,10 +32,10 @@
   },
   "devDependencies": {
     "@cprecioso/tsconfig": "^4.1.0",
-    "prettier": "3.8.3",
+    "prettier": "3.9.6",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-pkg": "0.22.1",
-    "prettier-plugin-sh": "0.18.1",
+    "prettier-plugin-sh": "0.19.0",
     "tsdown": "^0.22.2",
     "typedoc": "^0.28.19",
     "typedoc-plugin-mdn-links": "^5.1.1",
