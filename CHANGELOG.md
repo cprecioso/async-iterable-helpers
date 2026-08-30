@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/cprecioso/async-iterable-helpers/compare/v0.4.0...v0.4.1) (2026-08-30)
+
+
+### Bug Fixes
+
+* **take:** immediately stop upon reaching the specificied amount of items ([563869d](https://github.com/cprecioso/async-iterable-helpers/commit/563869de99438016857aa20ad361728d858dbd33))
+
 ## [0.4.0](https://github.com/cprecioso/async-iterable-helpers/compare/v0.3.0...v0.4.0) (2026-07-13)
 
 
