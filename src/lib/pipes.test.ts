@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { from, of } from "./creators";
+import { infinite, of } from "./creators";
 import {
   append,
   concat,
@@ -67,9 +67,7 @@ describe("tap", () => {
 
 describe("enumerated", () => {
   it("pairs each item with its zero-based index", async () => {
-    expect(
-      await of("a", "b", "c").pipe(enumerated()).sink(toArray()),
-    ).toEqual([
+    expect(await of("a", "b", "c").pipe(enumerated()).sink(toArray())).toEqual([
       [0, "a"],
       [1, "b"],
       [2, "c"],
@@ -216,17 +214,13 @@ describe("take", () => {
 
   it("stops consuming the source once n items are taken", async () => {
     let produced = 0;
-    async function* counting() {
-      while (true) {
-        produced++;
-        yield produced;
-      }
-    }
-    expect(await from(counting()).pipe(take(3)).sink(toArray())).toEqual([
-      1, 2, 3,
-    ]);
-    // One extra item is pulled before the break short-circuits.
-    expect(produced).toBe(4);
+    expect(
+      await infinite(7)
+        .pipe(tap(() => void produced++))
+        .pipe(take(3))
+        .sink(toArray()),
+    ).toEqual([7, 7, 7]);
+    expect(produced).toBe(3);
   });
 });
 

@@ -122,13 +122,12 @@ export function filterMap<T, U>(
  */
 export function take<T>(n: number): PipeFn<T, Awaited<T>> {
   return async function* (iterable) {
+    if (n <= 0) return;
+
     let i = 0;
     for await (const item of iterable) {
-      if (i++ < n) {
-        yield item;
-      } else {
-        break;
-      }
+      yield item;
+      if (++i >= n) break;
     }
   };
 }
