@@ -13,7 +13,7 @@
   },
   "author": "Carlos Precioso <npm@precioso.design>",
   "license": "ISC",
-  "packageManager": "yarn@4.18.0",
+  "packageManager": "yarn@4.18.1",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

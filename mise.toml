@@ -1,3 +1,8 @@
 [tools]
 node = "lts"
-"npm:corepack" = "latest"
+
+[tool_alias]
+yarn = "aqua:yarnpkg/berry"
+
+[settings]
+idiomatic_version_file_enable_tools = ["yarn"]
