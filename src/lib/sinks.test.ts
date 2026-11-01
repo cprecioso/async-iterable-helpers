@@ -1,6 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { from, of } from "./creators";
-import { first, groupMap, groupObject, last, reduce, toArray } from "./sinks";
+import {
+  first,
+  groupMap,
+  groupMapByKey,
+  groupObject,
+  groupObjectByKey,
+  last,
+  reduce,
+  toArray,
+} from "./sinks";
 
 describe("reduce", () => {
   it("folds items into an accumulator", async () => {
@@ -119,5 +128,59 @@ describe("groupMap", () => {
       [1, ["a", "c"]],
       [2, ["bb"]],
     ]);
+  });
+});
+
+type Shape =
+  { kind: "circle"; radius: number } | { kind: "square"; side: number };
+
+const shapes: Shape[] = [
+  { kind: "circle", radius: 1 },
+  { kind: "square", side: 2 },
+  { kind: "circle", radius: 3 },
+];
+
+describe("groupObjectByKey", () => {
+  it("groups items by the property's value", async () => {
+    const result = await from(shapes).sink(groupObjectByKey("kind"));
+    expect(result).toEqual({
+      circle: [shapes[0], shapes[2]],
+      square: [shapes[1]],
+    });
+  });
+
+  it("narrows each group to the matching union members", async () => {
+    const result = await from(shapes).sink(groupObjectByKey("kind"));
+    expectTypeOf(result.circle).toEqualTypeOf<
+      { kind: "circle"; radius: number }[] | undefined
+    >();
+    expectTypeOf(result.square).toEqualTypeOf<
+      { kind: "square"; side: number }[] | undefined
+    >();
+  });
+
+  it("rejects properties that aren't valid keys", () => {
+    // @ts-expect-error `value` is not a PropertyKey
+    groupObjectByKey<{ value: boolean }, "value">("value");
+  });
+});
+
+describe("groupMapByKey", () => {
+  it("groups items by the property's value", async () => {
+    const result = await from(shapes).sink(groupMapByKey("kind"));
+    expect([...result]).toEqual([
+      ["circle", [shapes[0], shapes[2]]],
+      ["square", [shapes[1]]],
+    ]);
+  });
+
+  it("narrows each group to the matching union members", async () => {
+    const result = await from(shapes).sink(groupMapByKey("kind"));
+    expectTypeOf(result.get("circle")).toEqualTypeOf<
+      { kind: "circle"; radius: number }[] | undefined
+    >();
+    expectTypeOf(result.get("square")).toEqualTypeOf<
+      { kind: "square"; side: number }[] | undefined
+    >();
   });
 });

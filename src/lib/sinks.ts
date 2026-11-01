@@ -1,3 +1,4 @@
+import type { ConditionalKeys } from "type-fest";
 import type { MaybePromise } from "./util";
 import type { SinkFn } from "./wrapper";
 
@@ -103,4 +104,49 @@ export function groupMap<T, K>(
     }
     return groups;
   };
+}
+
+/**
+ * Groups items into a null-prototype object according to the value of their
+ * `key` property. Like {@link groupObject}, but each group is narrowed to the
+ * union members whose `key` property matches that group's key.
+ *
+ * @param key The property to group by.
+ * @returns A sink resolving to an object mapping each key to the items in that
+ * group, in source order.
+ */
+export function groupObjectByKey<
+  T,
+  P extends ConditionalKeys<Awaited<T>, PropertyKey>,
+>(
+  key: P,
+): SinkFn<
+  T,
+  {
+    [K in Awaited<T>[P] & PropertyKey]?: Extract<Awaited<T>, Record<P, K>>[];
+  }
+> {
+  return groupObject((item: Awaited<T>) => item[key] as PropertyKey) as never;
+}
+
+/**
+ * Groups items into a `Map` according to the value of their `key` property.
+ * Like {@link groupMap}, but the returned map's `get` narrows each group to the
+ * union members whose `key` property matches the requested key.
+ *
+ * @param key The property to group by.
+ * @returns A sink resolving to a `Map` from each key to the items in that
+ * group, in source order.
+ */
+export function groupMapByKey<T, P extends keyof Awaited<T>>(
+  key: P,
+): SinkFn<
+  T,
+  {
+    get<K extends Awaited<T>[P]>(
+      key: K,
+    ): Extract<Awaited<T>, Record<P, K>>[] | undefined;
+  } & Map<Awaited<T>[P], Awaited<T>[]>
+> {
+  return groupMap((item: Awaited<T>) => item[key]) as never;
 }
