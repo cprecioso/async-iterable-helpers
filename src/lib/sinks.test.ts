@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { from, of } from "./creators";
-import { first, last, reduce, toArray } from "./sinks";
+import { first, groupMap, groupObject, last, reduce, toArray } from "./sinks";
 
 describe("reduce", () => {
   it("folds items into an accumulator", async () => {
@@ -58,5 +58,66 @@ describe("last", () => {
 
   it("returns undefined for an empty source", async () => {
     expect(await of<number>().sink(last<number>())).toBeUndefined();
+  });
+});
+
+describe("groupObject", () => {
+  it("groups items by key, preserving order", async () => {
+    const result = await of(1, 2, 3, 4, 5).sink(
+      groupObject((n: number) => (n % 2 ? "odd" : "even")),
+    );
+    expect(result).toEqual({ odd: [1, 3, 5], even: [2, 4] });
+  });
+
+  it("returns a null-prototype object", async () => {
+    const result = await of(1).sink(groupObject(() => "a"));
+    expect(Object.getPrototypeOf(result)).toBeNull();
+  });
+
+  it("returns an empty object for an empty source", async () => {
+    expect(await of<number>().sink(groupObject(() => "a"))).toEqual({});
+  });
+
+  it("awaits async key functions", async () => {
+    const result = await of("a", "bb", "c").sink(
+      groupObject(async (s: string) => (s.length < 2 ? "short" : "long")),
+    );
+    expect(result).toEqual({ short: ["a", "c"], long: ["bb"] });
+  });
+});
+
+describe("groupMap", () => {
+  it("groups items by key, preserving order", async () => {
+    const result = await of(1, 2, 3, 4, 5).sink(
+      groupMap((n: number) => n % 2 === 0),
+    );
+    expect([...result]).toEqual([
+      [false, [1, 3, 5]],
+      [true, [2, 4]],
+    ]);
+  });
+
+  it("uses object identity for keys", async () => {
+    const a = {};
+    const b = {};
+    const result = await of(1, 2, 3).sink(
+      groupMap((n: number) => (n === 2 ? b : a)),
+    );
+    expect(result.get(a)).toEqual([1, 3]);
+    expect(result.get(b)).toEqual([2]);
+  });
+
+  it("returns an empty map for an empty source", async () => {
+    expect((await of<number>().sink(groupMap(() => 0))).size).toBe(0);
+  });
+
+  it("awaits async key functions", async () => {
+    const result = await of("a", "bb", "c").sink(
+      groupMap(async (s: string) => s.length),
+    );
+    expect([...result]).toEqual([
+      [1, ["a", "c"]],
+      [2, ["bb"]],
+    ]);
   });
 });

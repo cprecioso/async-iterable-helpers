@@ -58,3 +58,49 @@ export function first<T>(): SinkFn<T, T | undefined> {
 export function last<T>(): SinkFn<T, Awaited<T> | undefined> {
   return reduce((_, item) => item, undefined as Awaited<T> | undefined);
 }
+
+/**
+ * Groups items into a null-prototype object according to the key returned by
+ * `fn`. The async counterpart of `Object.groupBy`. The key function may be
+ * async; its result is awaited.
+ *
+ * @param fn Returns the group key for each item.
+ * @returns A sink resolving to an object mapping each key to the items in that
+ * group, in source order.
+ */
+export function groupObject<T, K extends PropertyKey>(
+  fn: (item: Awaited<T>) => MaybePromise<K>,
+): SinkFn<T, Partial<Record<K, Awaited<T>[]>>> {
+  return async function (iterable) {
+    const groups: Partial<Record<K, Awaited<T>[]>> = Object.create(null);
+    for await (const item of iterable) {
+      const key = await fn(item);
+      (groups[key] ??= []).push(item);
+    }
+    return groups;
+  };
+}
+
+/**
+ * Groups items into a `Map` according to the key returned by `fn`. The async
+ * counterpart of `Map.groupBy`. Keys are compared with SameValueZero, so they
+ * may be any value. The key function may be async; its result is awaited.
+ *
+ * @param fn Returns the group key for each item.
+ * @returns A sink resolving to a `Map` from each key to the items in that
+ * group, in source order.
+ */
+export function groupMap<T, K>(
+  fn: (item: Awaited<T>) => MaybePromise<K>,
+): SinkFn<T, Map<K, Awaited<T>[]>> {
+  return async function (iterable) {
+    const groups = new Map<K, Awaited<T>[]>();
+    for await (const item of iterable) {
+      const key = await fn(item);
+      let group = groups.get(key);
+      if (!group) groups.set(key, (group = []));
+      group.push(item);
+    }
+    return groups;
+  };
+}
