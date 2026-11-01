@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/cprecioso/async-iterable-helpers/compare/v0.4.1...v0.5.0) (2026-11-01)
+
+
+### Features
+
+* add `groupObject` and `groupMap` ([91651c1](https://github.com/cprecioso/async-iterable-helpers/commit/91651c1f0db4696ccfaa944f6e86e1c04c840d4a))
+
 ## [0.4.1](https://github.com/cprecioso/async-iterable-helpers/compare/v0.4.0...v0.4.1) (2026-08-30)
 
 
