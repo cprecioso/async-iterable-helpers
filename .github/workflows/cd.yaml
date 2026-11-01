@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   build:
-    uses: ./.github/workflows/ci.yaml
+    uses: $/.github/workflows/ci.yaml
     secrets: inherit
 
   release-please:
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-repo
+      - uses: $/.github/actions/setup-repo
 
       - uses: actions/download-artifact@v8
         with:
